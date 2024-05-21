@@ -1,0 +1,39 @@
+
+---
+- name: Create VMs
+  hosts: localhost
+  gather_facts: no
+  collections:
+    - community.vmware
+
+  vars:
+    vcenter_hostname: "vwr-vc8.virtualweb.local"
+    vcenter_username: "bchemweno@virtualweb.local"
+    vcenter_password: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      61356230316465653039623633316533306162376563626237633538353662343362316662373030
+      6235643138363062383930613230333866316434356433660a363032336534376132336631386236
+      63376662303930396561366164333738323264383830386666393934363363383165303565396635
+      6339303330366434300a386466646632646330386363666663306666303639323834323362633431
+      3263
+    vm_template: "cf-pc02.ubuntu.template"
+    datacenter_name: "Rockville Datacenter"
+    cluster_name: "Gen14 Prod Cluster"
+    vm_folder_path: "/Root/vwr-vc8.virtualweb.local/Rockville Datacenter/vm/Virtualweb/UAT"
+    num_vms: 1
+
+  tasks:
+    - name: Create VMs
+      community.vmware.vmware_vm_from_template:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter_name: "{{ datacenter_name }}"
+        cluster_name: "{{ cluster_name }}"
+        template_name: "{{ vm_template }}"
+        folder: "{{ vm_folder_path }}"
+        name: "cf-pctest{{ '%02d' | format(item) }}.compfinity.local"
+        wait_for_ip_address: yes
+        num_vms: "{{ num_vms }}"
+      loop: "{{ range(1, num_vms + 1) | list }}"

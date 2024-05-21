@@ -1,0 +1,15 @@
+---
+- name: Deploy Multiple VMs
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    num_vms: 2
+
+  tasks:
+    - name: Create VMs
+      include_tasks: create_vm.yml
+      loop: "{{ range(1, num_vms + 1) | list }}"
+      loop_control:
+        loop_var: vm_number
+

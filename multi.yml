@@ -1,0 +1,24 @@
+---
+- name: Deploy Multiple VMs
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    num_vms: 3
+
+  tasks:
+    - name: Create VMs
+      vmware_guest:
+        hostname: 172.16.254.97
+        username: ansible@vsphere.local
+        password: P@ssw0rd254
+        folder: /vm
+        name: cf-pctest{{ '%02d' | format(vm_number) }}.compfinity.local
+        state: present
+        template: server2022Temp 
+        datacenter: Germantown Datacenter 
+        cluster: HP Cluster
+        validate_certs: no
+      loop: "{{ range(1, num_vms + 1) | list }}"
+      loop_control:
+        loop_var: vm_number

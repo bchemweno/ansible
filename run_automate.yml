@@ -1,0 +1,14 @@
+---
+- name: Run Python script to automate VM creation
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Copy Automate.py script to remote machine
+      copy:
+        src: /etc/ansible/playbooks/Automate.py
+        dest: /tmp/Automate.py
+
+    - name: Execute the Python script
+      command: python3 /tmp/Automate.py

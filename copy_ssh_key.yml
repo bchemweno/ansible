@@ -1,0 +1,19 @@
+---
+- name: Copy SSH public key to target servers
+  hosts: all  # Specify the target servers or group of servers
+  remote_user: root  # Use root as the remote user
+  become: yes  # Run tasks with sudo privileges
+
+  tasks:
+    - name: Ensure SSH directory exists
+      file:
+        path: "/root/.ssh"
+        state: directory
+        mode: "0700"
+
+    - name: Copy SSH public key to authorized_keys file
+      authorized_key:
+        user: root
+        key: "{{ lookup('file', '/home/ubuntu-admin/.ssh/id_rsa.pub') }}"
+        state: present
+

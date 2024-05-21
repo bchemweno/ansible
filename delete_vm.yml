@@ -1,0 +1,23 @@
+# delete_vms.yml
+
+- name: Delete VMs
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Delete VM cf-pctest01.compfinity.local
+      vmware_guest:
+        hostname: 172.16.254.31
+        username: bchemweno@virtualweb.local
+        password: Sinon1998!
+        validate_certs: no
+        name: cf-pctest01.compfinity.local
+        state: absent
+
+    - name: Delete VM cf-pctest02.compfinity.local
+      vmware_guest:
+        hostname: 172.16.254.31
+        username: bchemweno@virtualweb.local
+        password: Sinon1998!
+        validate_certs: no
+        name: cf-pctest02.compfinity.local
+        state: absent

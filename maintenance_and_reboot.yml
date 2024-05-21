@@ -1,0 +1,45 @@
+---
+- name: Set maintenance and reboot Windows servers
+  hosts: windows_servers
+  vars:
+    ansible_user: "{{ semaphore_ansible_user }}"
+    ansible_password: "{{ semaphore_ansible_password }}"
+    zabbix_user: "{{ semaphore_zabbix_user }}"
+    zabbix_password: "{{ semaphore_zabbix_password }}"
+  tasks:
+    - name: Set maintenance window in Zabbix
+      community.zabbix.zabbix_maintenance:
+        server_url: "http://172.16.6.2/zabbix/api_jsonrpc.php"
+        login_user: "{{ zabbix_user }}"
+        login_password: "{{ zabbix_password }}"
+        state: present
+        name: "Maintenance Window"
+        host_names:
+          - "{{ inventory_hostname }}"
+        time_periods:
+          - start_time: "{{ lookup('pipe', 'date -d "20:00" +%s') }}"
+            period: 3600
+        validate_certs: no
+
+    - name: Schedule reboot at 8 PM Kenyan time
+      ansible.windows.win_scheduled_task:
+        name: "Reboot"
+        description: "Scheduled reboot at 8 PM Kenyan time"
+        actions:
+          - path: "C:\\Windows\\System32\\shutdown.exe"
+            arguments: "/r /t 0"
+        triggers:
+          - type: daily
+            start_boundary: "2024-05-21T20:00:00"  # Adjust the date accordingly
+        username: "SYSTEM"
+        state: present
+
+- name: Reboot Windows servers
+  hosts: windows_servers
+  tasks:
+    - name: Reboot server
+      ansible.windows.win_reboot:
+        msg: "Reboot initiated by Ansible"
+        timeout: 600
+        reboot_timeout: 3600
+

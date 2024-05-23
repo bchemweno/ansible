@@ -1,11 +1,11 @@
 ---
 - name: Schedule and Reboot Windows Servers
-  hosts: Windows_servers
+  hosts: All
   collections:
     - ansible.windows
     - community.zabbix
   tasks:
-    - name: Schedule reboot at 8 PM Kenyan time
+    - name: Schedule reboot
       win_scheduled_task:
         name: "Reboot"
         description: "Scheduled reboot at 8 PM Kenyan time"

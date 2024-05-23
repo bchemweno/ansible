@@ -1,9 +1,11 @@
 ---
 - name: Schedule and Reboot Windows Servers
-  hosts: windows_servers
+  hosts: All  collections:
+    - ansible.windows
+    - community.zabbix
   tasks:
     - name: Schedule reboot at 8 PM Kenyan time
-      ansible.windows.win_scheduled_task:
+      win_scheduled_task:
         name: "Reboot"
         description: "Scheduled reboot at 8 PM Kenyan time"
         actions:
@@ -11,24 +13,27 @@
             arguments: "/r /t 0"
         triggers:
           - type: daily
-            start_boundary: "{{ 'now' | ansible.utils.date_time.ansible_datetime.iso8601 }}"
+            start_boundary: "2024-05-21T20:00:00"  # Replace with the desired date and time
         username: "SYSTEM"
         state: present
 
     - name: Set up Zabbix maintenance
-      community.zabbix.zabbix_maintenance:
-        server_url: "http://zabbix_server_url"
-        login_user: "zabbix_api_user"
-        login_password: "zabbix_api_password"
-        maintenance_name: "Server Reboot"
-        maintenance_start_date: "{{ 'now' | ansible.utils.date_time.ansible_datetime.iso8601 }}"
-        maintenance_period: "1h"
-        maintenance_create_unavailable: true
-        maintenance_tags:
-          - "Windows Servers"
+      zabbix_maintenance:
+        server_url: "http://172.16.6.2/zabbix/api_jsonrpc.php"
+        login_user: "{{ semaphore_zabbix_user }}"
+        login_password: "{{ semaphore_zabbix_password }}"
         state: present
+        name: "B-UAT Server Reboot"
+        host_names:
+          - "{{ inventory_hostname }}"
+        time_periods:
+          - start_time: "{{ lookup('pipe', 'date -d \"20:00\" +%s') }}"
+            period: 3600
+        validate_certs: no
 
     - name: Reboot Windows servers
-      ansible.windows.win_reboot:
+      win_reboot:
         msg: "Reboot initiated by Ansible"
         timeout: 600
+        reboot_timeout: 3600
+

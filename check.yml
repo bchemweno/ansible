@@ -1,17 +1,11 @@
 ---
-- name: Check if user exists in Active Directory
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Check if user exists in Active Directory
-      community.general.win_domain_user:
-        name: bchemweno
-        state: query
-        domain_username: "Administrator"
-        domain_password: "TechSupport2022"
-        domain_server: "compfinity.local"
-      register: user_info
+- hosts: all
+  collections:
+    - community.windows
 
-    - name: Print user information
-      ansible.builtin.debug:
-        var: user_info
+  tasks:
+    - name: Create a profile for the user
+      win_user_profile:
+        username: test
+        name: test
+        state: present

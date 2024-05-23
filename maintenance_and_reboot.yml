@@ -13,11 +13,11 @@
         login_user: "{{ zabbix_user }}"
         login_password: "{{ zabbix_password }}"
         state: present
-        name: "Maintenance Window"
+        name: "B-UAT Maintenance Window"
         host_names:
           - "{{ inventory_hostname }}"
         time_periods:
-          - start_time: "{{ lookup('pipe', 'date -d "20:00" +%s') }}"
+          - start_time: "{{ lookup('pipe', 'date -d \"20:00\" +%s') }}"
             period: 3600
         validate_certs: no
 

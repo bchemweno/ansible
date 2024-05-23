@@ -3,7 +3,7 @@
   hosts: windows_servers
   tasks:
     - name: Schedule reboot at 8 PM Kenyan time
-      community.windows.win_scheduled_task:
+      ansible.windows.win_scheduled_task:
         name: "Reboot"
         description: "Scheduled reboot at 8 PM Kenyan time"
         actions:
@@ -11,7 +11,7 @@
             arguments: "/r /t 0"
         triggers:
           - type: daily
-            start_boundary: "{{ '2024-05-21T20:00:00' }}"  # Replace with the desired date and time
+            start_boundary: "2024-05-21T20:00:00"  # Replace with the desired date and time
         username: "SYSTEM"
         state: present
 
@@ -30,7 +30,7 @@
         validate_certs: no
 
     - name: Reboot Windows servers
-      community.windows.win_reboot:
+      ansible.windows.win_reboot:
         msg: "Reboot initiated by Ansible"
         timeout: 600
         reboot_timeout: 3600

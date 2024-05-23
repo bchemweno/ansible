@@ -1,6 +1,6 @@
 ---
 - name: Schedule and Reboot Windows Servers
-  hosts: All
+  hosts: Windows_servers
   collections:
     - ansible.windows
     - community.zabbix

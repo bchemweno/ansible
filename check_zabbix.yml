@@ -1,0 +1,44 @@
+---
+- name: Check if Zabbix is installed and print process details
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check for Zabbix agent package
+      package_facts:
+      register: zabbix_package
+
+    - name: Print message when checking Zabbix agent installation
+      debug:
+        msg: "Checking if Zabbix agent is installed"
+
+    - name: Ensure Zabbix agent is installed
+      debug:
+        msg: "Zabbix agent is installed"
+      when: "'zabbix-agent' in zabbix_package.packages"
+
+    - name: Ensure Zabbix agent is not installed
+      debug:
+        msg: "Zabbix agent is not installed"
+      when: "'zabbix-agent' not in zabbix_package.packages"
+
+    - name: Print message when Zabbix agent installation check is complete
+      debug:
+        msg: "Completed checking Zabbix agent installation"
+
+    - name: Print message for checking Zabbix process
+      debug:
+        msg: "Checking Zabbix agent process"
+
+    - name: Check if Zabbix agent process is running
+      shell: pgrep -af zabbix_agentd
+      register: zabbix_process
+      ignore_errors: yes
+
+    - name: Print Zabbix agent process details
+      debug:
+        msg: "Zabbix agent process details: {{ zabbix_process.stdout if zabbix_process.rc == 0 else 'No Zabbix agent process running' }}"
+
+    - name: Print message when Zabbix process check is complete
+      debug:
+        msg: "Completed checking Zabbix agent process"
+

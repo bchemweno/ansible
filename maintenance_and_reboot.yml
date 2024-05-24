@@ -4,19 +4,22 @@
   collections:
     - ansible.windows
     - community.zabbix
+
   tasks:
-    - name: Schedule reboot
-      win_scheduled_task:
-        name: "Reboot"
-        description: "Scheduled reboot at 8 PM Kenyan time"
-        actions:
-          - path: "C:\\Windows\\System32\\shutdown.exe"
-            arguments: "/r /t 0"
-        triggers:
-          - type: daily
-            start_boundary: "2024-05-21T20:00:00"  # Replace with the desired date and time
-        username: "SYSTEM"
-        state: present
+    - name: Schedule reboot in vSphere
+      vmware_guest:
+        hostname: "vwr-vc8.virtualweb.local"
+        username: "bchemweno@virtualweb.local"
+        password: "Sinon1998!"
+        validate_certs: no  # Set to yes if you have proper certificates installed
+        name: "{{ inventory_hostname }}"  # Use Semaphore inventory hostname
+        state: poweredon  # Ensure the VM is powered on
+        hardware:
+          boot_order:
+            - network
+            - disk
+        wait_for_ip_address: yes  # Wait for VM to have an IP address
+      delegate_to: localhost  # Run the task on the Ansible control machine
 
     - name: Set up Zabbix maintenance
       zabbix_maintenance:
@@ -26,15 +29,8 @@
         state: present
         name: "B-UAT Server Reboot"
         host_names:
-          - "{{ inventory_hostname }}"
+          - "{{ inventory_hostname }}"  # Use Semaphore inventory hostname
         time_periods:
           - start_time: "{{ lookup('pipe', 'date -d \"20:00\" +%s') }}"
             period: 3600
-        validate_certs: no
-
-    - name: Reboot Windows servers
-      win_reboot:
-        msg: "Reboot initiated by Ansible"
-        timeout: 600
-        reboot_timeout: 3600
-
+        validate_certs: no 

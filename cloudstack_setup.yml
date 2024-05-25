@@ -11,7 +11,7 @@
     vm_name_prefix: "vm"
     api_url: "{{ lookup('env', 'API_URL') }}"
     api_key: "{{ lookup('env', 'API_KEY') }}"
-    secret_key: "{{ lookup('env', 'SECRET_KEY') }}"
+    api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
 
   tasks:
@@ -22,7 +22,7 @@
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         zone: "{{ zone }}"
         api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
+        api_secret: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: network
 
@@ -34,7 +34,7 @@
         network_domain: "example.local"
         zone: "{{ zone }}"
         api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
+        api_secret: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: subnet
 
@@ -48,7 +48,7 @@
         network: "{{ network.id }}"
         ip_address: auto
         api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
+        api_secret: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: vm_results
 
@@ -57,7 +57,7 @@
       ngine_io.cloudstack.cs_ip_address:
         vpc: "{{ subnet.id }}"
         api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
+        api_secret: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: public_ips
 
@@ -68,6 +68,6 @@
         ip_address: "{{ item.1.ipaddress }}"
         vm: "{{ item.0.id }}"
         api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
+        api_secret: "{{ secret_key }}"
         api_url: "{{ api_url }}"
 

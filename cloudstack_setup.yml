@@ -15,7 +15,7 @@
         name: "{{ network_name }}"
         display_text: "Wezeshanet Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
-        zone: "your-zone-name"
+        zone: "Maryland"
         api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
         secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
         api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
@@ -27,7 +27,7 @@
         display_text: "Wezeshanet Subnet"
         cidr: "10.0.0.0/16"
         network_domain: "wezeshanet.local"
-        zone: "your-zone-name"
+        zone: "Maryland"
         api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
         secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
         api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
@@ -38,8 +38,8 @@
       community.cloudstack.cs_instance:
         name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.wezeshanet.local"
         service_offering: "Small Instance"
-        template: "CentOS 7"
-        zone: "your-zone-name"
+        template: "Ubuntu 22.04 LTS"
+        zone: "Maryland"
         network: "{{ network.id }}"
         ip_address: auto
         api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"

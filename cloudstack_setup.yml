@@ -59,7 +59,7 @@
 
     - name: Add public IP to each VM
       loop: "{{ vm_results.results | zip(public_ips.results) | list }}"
-      ngine_io.cloudstack.cs_static_nat:
+      ngine_io.cloudstack.cs_staticnat:
         state: present
         ip_address: "{{ item.1.ipaddress }}"
         vm: "{{ item.0.id }}"

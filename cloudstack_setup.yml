@@ -2,8 +2,8 @@
 - name: Set up CloudStack environment
   hosts: localhost
   collections:
-    -ngine_io.cloudstack
-  
+    - ngine_io.cloudstack
+
   vars:
     num_vms: 3
     network_name: "wnc-network01.wezeshanet.local"
@@ -12,7 +12,7 @@
 
   tasks:
     - name: Create a new network
-      community.cloudstack.cs_network:
+      ngine_io.cloudstack.cs_network:
         name: "{{ network_name }}"
         display_text: "Wezeshanet Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
@@ -23,7 +23,7 @@
       register: network
 
     - name: Create a new subnet
-      community.cloudstack.cs_vpc:
+      ngine_io.cloudstack.cs_vpc:
         name: "{{ subnet_name }}"
         display_text: "Wezeshanet Subnet"
         cidr: "10.0.0.0/16"
@@ -36,7 +36,7 @@
 
     - name: Deploy multiple VMs
       loop: "{{ range(1, num_vms + 1) | list }}"
-      community.cloudstack.cs_instance:
+      ngine_io.cloudstack.cs_instance:
         name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.wezeshanet.local"
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
@@ -50,7 +50,7 @@
 
     - name: Assign a public IP to each VM
       loop: "{{ vm_results.results }}"
-      community.cloudstack.cs_ip_address:
+      ngine_io.cloudstack.cs_ip_address:
         vpc: "{{ subnet.id }}"
         api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
         secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
@@ -59,7 +59,7 @@
 
     - name: Add public IP to each VM
       loop: "{{ vm_results.results | zip(public_ips.results) | list }}"
-      community.cloudstack.cs_static_nat:
+      ngine_io.cloudstack.cs_static_nat:
         state: present
         ip_address: "{{ item.1.ipaddress }}"
         vm: "{{ item.0.id }}"

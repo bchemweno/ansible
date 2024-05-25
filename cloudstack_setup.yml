@@ -1,49 +1,54 @@
 ---
-- name: Set up Wezeshanet Cloud environment
+- name: Set up CloudStack environment
   hosts: localhost
   collections:
     - ngine_io.cloudstack
 
   vars:
     num_vms: 3
-    network_name: "wnc-network01.wezeshanet.local"
-    subnet_name: "wnc-subnet01.wezeshanet.local"
-    vm_name_prefix: "wnc-vm"
-    api_url: "{{ lookup('env', 'WEZESHANET_API_URL') }}"
-    api_token: "{{ lookup('env', 'WEZESHANET_API_TOKEN') }}"
+    network_name: "network01.example.local"
+    subnet_name: "subnet01.example.local"
+    vm_name_prefix: "vm"
+    api_url: "{{ lookup('env', 'API_URL') }}"
+    api_key: "{{ lookup('env', 'API_KEY') }}"
+    secret_key: "{{ lookup('env', 'SECRET_KEY') }}"
+    zone: "us-east-1b"
 
   tasks:
     - name: Create a new network
       ngine_io.cloudstack.cs_network:
         name: "{{ network_name }}"
-        display_text: "Wezeshanet Network"
+        display_text: "Example Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
-        zone: "Maryland"
-        api_key: "{{ api_token }}"
+        zone: "{{ zone }}"
+        api_key: "{{ api_key }}"
+        secret_key: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: network
 
     - name: Create a new subnet
       ngine_io.cloudstack.cs_vpc:
         name: "{{ subnet_name }}"
-        display_text: "Wezeshanet Subnet"
+        display_text: "Example Subnet"
         cidr: "10.0.0.0/16"
-        network_domain: "wezeshanet.local"
-        zone: "Maryland"
-        api_key: "{{ api_token }}"
+        network_domain: "example.local"
+        zone: "{{ zone }}"
+        api_key: "{{ api_key }}"
+        secret_key: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: subnet
 
     - name: Deploy multiple VMs
       loop: "{{ range(1, num_vms + 1) | list }}"
       ngine_io.cloudstack.cs_instance:
-        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.wezeshanet.local"
+        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.example.local"
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
-        zone: "Maryland"
+        zone: "{{ zone }}"
         network: "{{ network.id }}"
         ip_address: auto
-        api_key: "{{ api_token }}"
+        api_key: "{{ api_key }}"
+        secret_key: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: vm_results
 
@@ -51,7 +56,8 @@
       loop: "{{ vm_results.results }}"
       ngine_io.cloudstack.cs_ip_address:
         vpc: "{{ subnet.id }}"
-        api_key: "{{ api_token }}"
+        api_key: "{{ api_key }}"
+        secret_key: "{{ secret_key }}"
         api_url: "{{ api_url }}"
       register: public_ips
 
@@ -61,6 +67,7 @@
         state: present
         ip_address: "{{ item.1.ipaddress }}"
         vm: "{{ item.0.id }}"
-        api_key: "{{ api_token }}"
+        api_key: "{{ api_key }}"
+        secret_key: "{{ secret_key }}"
         api_url: "{{ api_url }}"
 

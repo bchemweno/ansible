@@ -1,7 +1,8 @@
 ---
 - name: Set up CloudStack environment
   hosts: localhost
-  gather_facts: no
+  collections:
+    - community.cloudstack
 
   vars:
     num_vms: 3

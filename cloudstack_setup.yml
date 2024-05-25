@@ -2,8 +2,13 @@
 - name: Set up CloudStack environment
   hosts: localhost
   collections:
+<<<<<<< HEAD
     - community.cloudstack
 
+=======
+    -ngine_io.cloudstack
+  
+>>>>>>> decb060 (cloudstack environment)
   vars:
     num_vms: 3
     network_name: "wnc-network01.wezeshanet.local"

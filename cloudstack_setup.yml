@@ -13,7 +13,7 @@
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
-    cs_disable_ssl_verification: true
+    validate_certs: no
 
   tasks:
     - name: Create a new network

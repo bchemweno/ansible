@@ -1,5 +1,5 @@
 ---
-- name: Set up CloudStack environment
+- name: Set up Wezeshanet Cloud environment
   hosts: localhost
   collections:
     - ngine_io.cloudstack
@@ -9,6 +9,8 @@
     network_name: "wnc-network01.wezeshanet.local"
     subnet_name: "wnc-subnet01.wezeshanet.local"
     vm_name_prefix: "wnc-vm"
+    api_url: "{{ lookup('env', 'WEZESHANET_API_URL') }}"
+    api_token: "{{ lookup('env', 'WEZESHANET_API_TOKEN') }}"
 
   tasks:
     - name: Create a new network
@@ -17,9 +19,8 @@
         display_text: "Wezeshanet Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         zone: "Maryland"
-        api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
-        secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
-        api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
+        api_key: "{{ api_token }}"
+        api_url: "{{ api_url }}"
       register: network
 
     - name: Create a new subnet
@@ -29,9 +30,8 @@
         cidr: "10.0.0.0/16"
         network_domain: "wezeshanet.local"
         zone: "Maryland"
-        api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
-        secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
-        api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
+        api_key: "{{ api_token }}"
+        api_url: "{{ api_url }}"
       register: subnet
 
     - name: Deploy multiple VMs
@@ -43,18 +43,16 @@
         zone: "Maryland"
         network: "{{ network.id }}"
         ip_address: auto
-        api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
-        secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
-        api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
+        api_key: "{{ api_token }}"
+        api_url: "{{ api_url }}"
       register: vm_results
 
     - name: Assign a public IP to each VM
       loop: "{{ vm_results.results }}"
       ngine_io.cloudstack.cs_ip_address:
         vpc: "{{ subnet.id }}"
-        api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
-        secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
-        api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
+        api_key: "{{ api_token }}"
+        api_url: "{{ api_url }}"
       register: public_ips
 
     - name: Add public IP to each VM
@@ -63,7 +61,6 @@
         state: present
         ip_address: "{{ item.1.ipaddress }}"
         vm: "{{ item.0.id }}"
-        api_key: "{{ lookup('env', 'CLOUDSTACK_API_KEY') }}"
-        secret_key: "{{ lookup('env', 'CLOUDSTACK_SECRET_KEY') }}"
-        api_url: "{{ lookup('env', 'CLOUDSTACK_API_URL') }}"
+        api_key: "{{ api_token }}"
+        api_url: "{{ api_url }}"
 

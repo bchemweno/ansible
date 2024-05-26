@@ -13,7 +13,8 @@
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
-    
+    api_verify_ssl_cert: false
+
   environment:
     REQUESTS_CA_BUNDLE: ""
 

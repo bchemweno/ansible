@@ -3,9 +3,20 @@
   hosts: vm_group
   become: yes
   vars:
-    vm_username: "{{ lookup('env', 'VM_USERNAME') }}"  # Environment variable for VM username
-    vm_password: "{{ lookup('env', 'VM_PASSWORD') }}"  # Environment variable for VM password
+    ansible_user: "{{ lookup('env', 'VM_USERNAME') }}"
+    ansible_password: "{{ lookup('env', 'VM_PASSWORD') }}"
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   tasks:
+    - name: Test SSH connectivity to the VM
+      ansible.builtin.command: echo "SSH connection successful"
+      register: ssh_test
+      ignore_errors: yes
+
+    - name: Fail if SSH connectivity test failed
+      fail:
+        msg: "SSH connection to {{ inventory_hostname }} failed"
+      when: ssh_test.failed
+
     - name: Check for Zabbix agent package on VM
       ansible.builtin.package_facts:
       register: zabbix_package

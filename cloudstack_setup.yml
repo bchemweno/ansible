@@ -13,6 +13,7 @@
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
+    validate_certs: no
     api_verify_ssl_cert: false
 
   tasks:

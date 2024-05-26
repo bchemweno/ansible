@@ -14,7 +14,7 @@
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
-    api_verify_ssl_cert: false
+    validate_certs: no
  
 
   tasks:
@@ -27,7 +27,7 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-        api_verify_ssl_cert: "{{ api_verify_ssl_cert }}"
+        validate_certs: "{{ validate_certs }}"
       register: network
 
     - name: Create a new subnet
@@ -40,7 +40,7 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-        api_verify_ssl_cert: "{{ api_verify_ssl_cert }}"
+        validate_certs: "{{ validate_certs }}"
       register: subnet
 
     - name: Deploy multiple VMs
@@ -55,7 +55,7 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-        api_verify_ssl_cert: "{{ api_verify_ssl_cert }}"
+        validate_certs: "{{ validate_certs }}"
       register: vm_results
 
     - name: Assign a public IP to each VM
@@ -65,7 +65,7 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-        api_verify_ssl_cert: "{{ api_verify_ssl_cert }}"
+        validate_certs: "{{ validate_certs }}"
       register: public_ips
 
     - name: Add public IP to each VM
@@ -77,6 +77,6 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-        api_verify_ssl_cert: "{{ api_verify_ssl_cert }}"
+        validate_certs: "{{ validate_certs }}"
        
 

@@ -3,6 +3,7 @@
   hosts: localhost
   collections:
     - ngine_io.cloudstack
+  api_verify_ssl_cert: false
 
   vars:
     num_vms: 3
@@ -13,10 +14,8 @@
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
-    api_verify_ssl_cert: false
-
-  environment:
-    REQUESTS_CA_BUNDLE: ""
+      # api_verify_ssl_cert: false
+ 
 
   tasks:
     - name: Create a new network

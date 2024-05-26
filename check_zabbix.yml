@@ -1,44 +1,47 @@
 ---
-- name: Check if Zabbix is installed and print process details
-  hosts: all
+- name: Check if Zabbix is installed and print process details on a specific VM
+  hosts: vm_group
   become: yes
+  vars:
+    vm_username: "{{ lookup('env', 'VM_USERNAME') }}"  # Environment variable for VM username
+    vm_password: "{{ lookup('env', 'VM_PASSWORD') }}"  # Environment variable for VM password
   tasks:
-    - name: Check for Zabbix agent package
-      package_facts:
+    - name: Check for Zabbix agent package on VM
+      ansible.builtin.package_facts:
       register: zabbix_package
 
-    - name: Print message when checking Zabbix agent installation
+    - name: Print message when checking Zabbix agent installation on VM
       debug:
-        msg: "Checking if Zabbix agent is installed"
+        msg: "Checking if Zabbix agent is installed on {{ inventory_hostname }}"
 
-    - name: Ensure Zabbix agent is installed
+    - name: Ensure Zabbix agent is installed on VM
       debug:
-        msg: "Zabbix agent is installed"
+        msg: "Zabbix agent is installed on {{ inventory_hostname }}"
       when: "'zabbix-agent' in zabbix_package.packages"
 
-    - name: Ensure Zabbix agent is not installed
+    - name: Ensure Zabbix agent is not installed on VM
       debug:
-        msg: "Zabbix agent is not installed"
+        msg: "Zabbix agent is not installed on {{ inventory_hostname }}"
       when: "'zabbix-agent' not in zabbix_package.packages"
 
-    - name: Print message when Zabbix agent installation check is complete
+    - name: Print message when Zabbix agent installation check on VM is complete
       debug:
-        msg: "Completed checking Zabbix agent installation"
+        msg: "Completed checking Zabbix agent installation on {{ inventory_hostname }}"
 
-    - name: Print message for checking Zabbix process
+    - name: Print message for checking Zabbix process on VM
       debug:
-        msg: "Checking Zabbix agent process"
+        msg: "Checking Zabbix agent process on {{ inventory_hostname }}"
 
-    - name: Check if Zabbix agent process is running
-      shell: pgrep -af zabbix_agentd
+    - name: Check if Zabbix agent process is running on VM
+      ansible.builtin.shell: pgrep -af zabbix_agentd
       register: zabbix_process
       ignore_errors: yes
 
-    - name: Print Zabbix agent process details
+    - name: Print Zabbix agent process details on VM
       debug:
-        msg: "Zabbix agent process details: {{ zabbix_process.stdout if zabbix_process.rc == 0 else 'No Zabbix agent process running' }}"
+        msg: "Zabbix agent process details on {{ inventory_hostname }}: {{ zabbix_process.stdout if zabbix_process.rc == 0 else 'No Zabbix agent process running' }}"
 
-    - name: Print message when Zabbix process check is complete
+    - name: Print message when Zabbix process check on VM is complete
       debug:
-        msg: "Completed checking Zabbix agent process"
+        msg: "Completed checking Zabbix agent process on {{ inventory_hostname }}"
 

@@ -43,7 +43,7 @@
     - name: Deploy multiple VMs
       loop: "{{ range(1, num_vms + 1) | list }}"
       ngine_io.cloudstack.cs_instance:
-        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.example.local"
+        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}"
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
         zone: "{{ zone }}"

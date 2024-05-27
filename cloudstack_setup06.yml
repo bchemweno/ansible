@@ -1,0 +1,18 @@
+---
+- name: List Network Offerings
+  hosts: localhost
+  collections:
+    - ngine_io.cloudstack
+
+  tasks:
+    - name: Gather network offerings
+      ngine_io.cloudstack.cs_network_offering_info:
+        api_key: "{{ lookup('env', 'API_KEY') }}"
+        api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
+        api_url: "{{ lookup('env', 'API_URL') }}"
+      register: network_offerings
+
+    - name: Print network offerings
+      debug:
+        var: network_offerings
+

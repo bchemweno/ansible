@@ -5,64 +5,50 @@
     - ngine_io.cloudstack
 
   vars:
+    num_subnets: 3
     num_vms: 3
-    network_name_prefix: "network"
+    network_name: "network01.example.local"
     subnet_name_prefix: "subnet"
-    vm_name_prefix: "testvm"
-    domain_suffix: "compfinity.local"
+    vm_name_prefix: "vm"
     api_url: "{{ lookup('env', 'API_URL') }}"
     api_key: "{{ lookup('env', 'API_KEY') }}"
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
-    cidrs: ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
-    affinity_groups: ["PROD", "DR", "UAT"]
 
   tasks:
-    - name: Create a new VPC
-      ngine_io.cloudstack.cs_vpc:
-        name: "vpc01.{{ domain_suffix }}"
-        display_text: "Example VPC"
-        cidr: "10.0.0.0/16"
-        network_domain: "{{ domain_suffix }}"
-        zone: "{{ zone }}"
-        api_key: "{{ api_key }}"
-        api_secret: "{{ api_secret }}"
-        api_url: "{{ api_url }}"
-      register: vpc
-
-    - name: Create guest networks
-      loop: "{{ range(1, 4) | list }}"
+    - name: Create a new network
       ngine_io.cloudstack.cs_network:
-        name: "{{ network_name_prefix }}{{ '%02d' | format(item) }}.{{ domain_suffix }}"
-        display_text: "Example Network {{ item }}"
+        name: "{{ network_name }}"
+        display_text: "Example Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         zone: "{{ zone }}"
-        vpc: "{{ vpc.id }}"
-        cidr: "{{ cidrs[item-1] }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-      register: networks
+      register: network
 
-    - name: Create affinity groups
-      loop: "{{ affinity_groups }}"
-      ngine_io.cloudstack.cs_affinitygroup:
-        name: "{{ item }}"
-        type: "host anti-affinity"
+    - name: Create multiple subnets
+      loop: "{{ range(1, num_subnets + 1) | list }}"
+      ngine_io.cloudstack.cs_vpc:
+        name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.example.local"
+        display_text: "Example Subnet"
+        cidr: "10.{{ item }}.0.0/16"
+        network_domain: "example.local"
+        zone: "{{ zone }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
+      register: subnets
 
     - name: Deploy multiple VMs
       loop: "{{ range(1, num_vms + 1) | list }}"
       ngine_io.cloudstack.cs_instance:
-        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.{{ domain_suffix }}"
+        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.example.local"
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
         zone: "{{ zone }}"
-        network: "{{ networks.results[item-1].id }}"
+        network: "{{ network.id }}"
         ip_address: auto
-        affinity_groups: ["{{ affinity_groups[item-1] }}"]
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
@@ -71,7 +57,7 @@
     - name: Assign a public IP to each VM
       loop: "{{ vm_results.results }}"
       ngine_io.cloudstack.cs_ip_address:
-        vpc: "{{ vpc.id }}"
+        vpc: "{{ subnets.results[0].id }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
@@ -86,4 +72,3 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
-

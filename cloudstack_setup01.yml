@@ -19,6 +19,7 @@
       - { cidr: "10.0.1.0/24", gateway: "10.0.1.1", start_ip: "10.0.1.2", end_ip: "10.0.1.254", netmask: "255.255.255.0" }
       - { cidr: "10.0.2.0/24", gateway: "10.0.2.1", start_ip: "10.0.2.2", end_ip: "10.0.2.254", netmask: "255.255.255.0" }
     affinity_groups: ["PROD", "DR", "UAT"]
+    vpc_network_offering: "DefaultVPCNetworkOfferingNoLB"
 
   tasks:
     - name: Create a new VPC
@@ -38,7 +39,7 @@
       ngine_io.cloudstack.cs_network:
         name: "{{ network_name_prefix }}{{ '%02d' | format(item[0] + 1) }}.{{ domain_suffix }}"
         display_text: "Example Network {{ item[0] + 1 }}"
-        network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
+        network_offering: "{{ vpc_network_offering }}"
         zone: "{{ zone }}"
         vpc: "{{ vpc.id }}"
         start_ip: "{{ item[1].start_ip }}"

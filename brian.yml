@@ -15,7 +15,7 @@
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
     vpc_offering: "Default VPC offering"
-    subnet_network_offering: "offering for isolated vpc networks with source nat service enabled"
+    subnet_network_offering: "Offering for Isolated  networks with Source Nat service enabled"
 
   tasks:
     - name: Create a new VPC
@@ -30,9 +30,6 @@
         api_url: "{{ api_url }}"
       register: vpc
 
-    - name: Debug VPC variable
-      debug:
-        var: vpc
 
     - name: Create multiple subnets within the VPC
       loop: "{{ range(1, num_subnets + 1) | list }}"

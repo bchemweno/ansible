@@ -60,9 +60,12 @@
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
         zone: "{{ zone }}"
-        network: "{{ subnets.results[item % num_subnets].id }}"
+        network: "{{ subnets.results[item % num_subnets].network.id }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
       register: vm_results
 
+    - name: Debug VMs creation result
+      debug:
+        var: vm_results

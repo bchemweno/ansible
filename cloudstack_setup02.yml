@@ -48,7 +48,6 @@
         template: "Ubuntu 22.04 LTS"
         zone: "{{ zone }}"
         network: "{{ network.id }}"
-        ip_address: auto
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
@@ -57,7 +56,7 @@
     - name: Assign a public IP to each VM
       loop: "{{ vm_results.results }}"
       ngine_io.cloudstack.cs_ip_address:
-        vpc: "{{ subnets.results[0].id }}"
+        vpc: "{{ network.id }}"  # Use network.id instead of subnets.results[0].id
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
@@ -72,3 +71,4 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
+

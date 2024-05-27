@@ -15,6 +15,7 @@
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
     vpc_offering: "Default VPC offering"
+    subnet_network_offering: "offering for isolated vpc networks with source nat service enabled"
 
   tasks:
     - name: Create a new VPC
@@ -38,8 +39,7 @@
       ngine_io.cloudstack.cs_network:
         name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.compfinity.local"
         display_text: "Compfinity Subnet {{ item }}"
-        cidr: "10.{{ item }}.0.0/24"
-        network_offering: "offering for isolated vpc networks with source nat service enabled"
+        network_offering: "{{ subnet_network_offering }}"
         vpc: "{{ vpc.id }}"
         zone: "{{ zone }}"
         api_key: "{{ api_key }}"

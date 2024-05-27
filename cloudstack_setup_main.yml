@@ -28,6 +28,10 @@
         api_url: "{{ api_url }}"
       register: vpc
 
+    - name: Debug VPC creation result
+      debug:
+        var: vpc
+
     - name: Create multiple subnets within the VPC
       loop: "{{ range(1, num_subnets + 1) | list }}"
       ngine_io.cloudstack.cs_network:
@@ -41,6 +45,10 @@
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
       register: subnets
+
+    - name: Debug subnets creation result
+      debug:
+        var: subnets
 
     - name: Deploy multiple VMs within the subnets
       loop: "{{ range(1, num_vms + 1) | list }}"

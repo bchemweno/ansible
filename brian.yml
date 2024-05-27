@@ -15,7 +15,7 @@
     api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
     zone: "us-east-1b"
     vpc_offering: "Default VPC offering"
-    subnet_network_offering: "Offering for Isolated  networks with Source Nat service enabled"
+    subnet_network_offering: "Offering for Isolated Vpc networks with Source Nat service enabled"
 
   tasks:
     - name: Create a new VPC

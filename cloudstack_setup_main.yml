@@ -37,7 +37,10 @@
       ngine_io.cloudstack.cs_network:
         name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.compfinity.local"
         display_text: "Compfinity Subnet {{ item }}"
-        cidr: "10.0.{{ item }}.0/24"
+        start_ip: "10.0.{{ item }}.2"
+        end_ip: "10.0.{{ item }}.254"
+        netmask: "255.255.255.0"
+        gateway: "10.0.{{ item }}.1"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         vpc: "{{ vpc.id }}"
         zone: "{{ zone }}"

@@ -1,0 +1,57 @@
+---
+- name: Set up CloudStack environment
+  hosts: localhost
+  collections:
+    - ngine_io.cloudstack
+
+  vars:
+    num_subnets: 3
+    num_vms: 1
+    network_name: "network01.compfinity.local"
+    subnet_name_prefix: "subnet"
+    vm_name_prefix: "vm"
+    api_url: "{{ lookup('env', 'API_URL') }}"
+    api_key: "{{ lookup('env', 'API_KEY') }}"
+    api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
+    zone: "us-east-1b"
+
+  tasks:
+    - name: Create a new VPC
+      ngine_io.cloudstack.cs_vpc:
+        name: "{{ network_name }}"
+        display_text: "Compfinity VPC"
+        cidr: "10.0.0.0/16"
+        network_domain: "Compfinity.local"
+        zone: "{{ zone }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      register: vpc
+
+    - name: Create multiple subnets within the VPC
+      loop: "{{ range(1, num_subnets + 1) | list }}"
+      ngine_io.cloudstack.cs_network:
+        name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.compfinity.local"
+        display_text: "Compfinity Subnet {{ item }}"
+        cidr: "10.0.{{ item }}.0/24"
+        network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
+        vpc: "{{ vpc.id }}"
+        zone: "{{ zone }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      register: subnets
+
+    - name: Deploy multiple VMs within the subnets
+      loop: "{{ range(1, num_vms + 1) | list }}"
+      ngine_io.cloudstack.cs_instance:
+        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}"
+        service_offering: "Small Instance"
+        template: "Ubuntu 22.04 LTS"
+        zone: "{{ zone }}"
+        network: "{{ subnets.results[item % num_subnets].id }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      register: vm_results
+

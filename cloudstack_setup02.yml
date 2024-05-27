@@ -6,7 +6,7 @@
 
   vars:
     num_subnets: 3
-    num_vms: 3
+    num_vms: 1 
     network_name: "network01.compfinity.local"
     subnet_name_prefix: "subnet"
     vm_name_prefix: "vm"

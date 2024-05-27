@@ -7,7 +7,7 @@
   vars:
     num_subnets: 3
     num_vms: 3
-    network_name: "network01.example.local"
+    network_name: "network01.compfinity.local"
     subnet_name_prefix: "subnet"
     vm_name_prefix: "vm"
     api_url: "{{ lookup('env', 'API_URL') }}"
@@ -19,7 +19,7 @@
     - name: Create a new network
       ngine_io.cloudstack.cs_network:
         name: "{{ network_name }}"
-        display_text: "Example Network"
+        display_text: "Compfinity Network"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         zone: "{{ zone }}"
         api_key: "{{ api_key }}"
@@ -30,10 +30,10 @@
     - name: Create multiple subnets
       loop: "{{ range(1, num_subnets + 1) | list }}"
       ngine_io.cloudstack.cs_vpc:
-        name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.example.local"
-        display_text: "Example Subnet"
+        name: "{{ subnet_name_prefix }}{{ '%02d' | format(item) }}.compfinity.local"
+        display_text: "Compfinity Subnet"
         cidr: "10.{{ item }}.0.0/16"
-        network_domain: "example.local"
+        network_domain: "Compfinity.local"
         zone: "{{ zone }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"

@@ -34,24 +34,24 @@
       register: vpc
 
     - name: Create guest networks
-      loop: "{{ network_details }}"
+      with_items: "{{ network_details }}"
       ngine_io.cloudstack.cs_network:
-        name: "{{ network_name_prefix }}{{ '%02d' | format(loop.index) }}.{{ domain_suffix }}"
-        display_text: "Example Network {{ loop.index }}"
+        name: "{{ network_name_prefix }}{{ '%02d' | format(item.key + 1) }}.{{ domain_suffix }}"
+        display_text: "Example Network {{ item.key + 1 }}"
         network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
         zone: "{{ zone }}"
         vpc: "{{ vpc.id }}"
-        start_ip: "{{ item.start_ip }}"
-        end_ip: "{{ item.end_ip }}"
-        netmask: "{{ item.netmask }}"
-        gateway: "{{ item.gateway }}"
+        start_ip: "{{ item.value.start_ip }}"
+        end_ip: "{{ item.value.end_ip }}"
+        netmask: "{{ item.value.netmask }}"
+        gateway: "{{ item.value.gateway }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
       register: networks
 
     - name: Create affinity groups
-      loop: "{{ affinity_groups }}"
+      with_items: "{{ affinity_groups }}"
       ngine_io.cloudstack.cs_affinitygroup:
         name: "{{ item }}"
         type: "host anti-affinity"
@@ -60,22 +60,22 @@
         api_url: "{{ api_url }}"
 
     - name: Deploy multiple VMs
-      loop: "{{ range(1, num_vms + 1) | list }}"
+      with_sequence: start=1 end={{ num_vms }}
       ngine_io.cloudstack.cs_instance:
         name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}.{{ domain_suffix }}"
         service_offering: "Small Instance"
         template: "Ubuntu 22.04 LTS"
         zone: "{{ zone }}"
-        network: "{{ networks.results[item-1].id }}"
+        network: "{{ networks.results[item - 1].id }}"
         ip_address: auto
-        affinity_groups: ["{{ affinity_groups[item-1] }}"]
+        affinity_groups: ["{{ affinity_groups[item - 1] }}"]
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
       register: vm_results
 
     - name: Assign a public IP to each VM
-      loop: "{{ vm_results.results }}"
+      with_items: "{{ vm_results.results }}"
       ngine_io.cloudstack.cs_ip_address:
         vpc: "{{ vpc.id }}"
         api_key: "{{ api_key }}"
@@ -84,7 +84,7 @@
       register: public_ips
 
     - name: Add public IP to each VM
-      loop: "{{ vm_results.results | zip(public_ips.results) | list }}"
+      with_items: "{{ vm_results.results | zip(public_ips.results) | list }}"
       ngine_io.cloudstack.cs_staticnat:
         state: present
         ip_address: "{{ item.1.ipaddress }}"

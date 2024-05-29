@@ -1,0 +1,33 @@
+---
+- name: Create a VM
+  hosts: localhost
+  vars:
+    vm_name: "{{ semaphore_vm_name }}"
+    zone: "{{ semaphore_zone }}"
+    service_offering: "{{ semaphore_service_offering }}"
+    template: "{{ semaphore_template }}"
+    api_url: "{{ semaphore_api_url }}"
+    pat: "{{ semaphore_pat }}"
+
+  tasks:
+    - name: Create a VM
+      uri:
+        url: "{{ api_url }}?command=deployVirtualMachine&name={{ vm_name | urlencode }}&displayname=My%20VM&zoneid={{ zone | urlencode }}&serviceofferingid={{ service_offering | urlencode }}&templateid={{ template | urlencode }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ pat }}"
+        validate_certs: no
+      register: vm_response
+
+    - name: Debug VM variable
+      debug:
+        var: vm_response
+
+    - name: Set VM ID fact
+      set_fact:
+        vm_id: "{{ vm_response['deployvirtualmachineresponse']['id'] }}"
+
+    - name: Print VM ID
+      debug:
+        msg: "VM ID: {{ vm_id }}"
+

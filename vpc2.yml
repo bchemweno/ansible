@@ -1,0 +1,43 @@
+---
+- name: Set up CloudStack environment
+  hosts: localhost
+  collections:
+    - ngine_io.cloudstack
+  vars:
+    bearer_token: "9c2a5f23-afdd-4e99-854a-9fa5994e57af|YLzUJUU4rLOnvQQjtjd6UFqOH338Qi7GUyYohNrY9cc954f6"
+    api_url: "https://wezeshanet.stackpoc.live/app/profile/api"
+  tasks:
+    - name: Set up authentication using bearer token
+      set_fact:
+        headers:
+          Authorization: "Bearer {{ bearer_token }}"
+
+    - name: Create VM using CloudStack API
+      ngine_io.cloudstack.cs_instance:
+        name: my_vm
+        template: Ubuntu 22.04
+        zone: Zone1
+        service_offering: Small
+        state: present
+        headers: "{{ headers }}"
+        api_url: "{{ api_url }}"
+
+    - name: Create Subnet using CloudStack API
+      ngine_io.cloudstack.cs_network:
+        name: my_subnet
+        display_text: My Subnet
+        zone_name: Zone1
+        cidr: 10.1.1.0/24
+        state: present
+        headers: "{{ headers }}"
+        api_url: "{{ api_url }}"
+
+    - name: Create VPC using CloudStack API
+      ngine_io.cloudstack.cs_vpc:
+        name: my_vpc
+        display_text: My VPC
+        cidr_block: 10.1.0.0/16
+        vpc_offering_name: "Default VPC offering"
+        headers: "{{ headers }}"
+        api_url: "{{ api_url }}"
+

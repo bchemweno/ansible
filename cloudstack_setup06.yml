@@ -14,7 +14,6 @@
     zone: "us-east-1a"
     template: "Ubuntu 22.04 LTS"
     service_offering: "Small Instance"
-    network: "Compfinity"
     vpc_name: "BrianVPC"
     vpc_cidr: "10.1.0.0/16"
     network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
@@ -26,6 +25,7 @@
         cidr: "{{ vpc_cidr }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
+        zone: "{{ zone }}"
         api_url: "{{ api_url }}"
       register: vpc_result
 

@@ -40,7 +40,7 @@
         vpc: "{{ vpc_result.id }}"
         network_offering: "{{ network_offering }}"
         gateway: "{{ gateway }}"
-        subnetmask: "{{ subnetmask }}"
+        cidr: "{{ vpc_cidr }}"
         acl: "{{ acl }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"

@@ -38,6 +38,7 @@
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
+        zone: "{{ zone }}"
       register: network_result
 
     - name: Deploy multiple VMs

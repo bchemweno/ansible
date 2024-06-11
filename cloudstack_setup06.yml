@@ -14,6 +14,7 @@
     zone: "us-east-1a"
     template: "Ubuntu 22.04 LTS"
     service_offering: "Small Instance"
+    network: "BrianNetwork"
     vpc_name: "BrianVPC"
     vpc_cidr: "10.1.0.0/16"
     network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"

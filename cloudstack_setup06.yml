@@ -1,53 +1,29 @@
 ---
-- name: Set up CloudStack environment
+- name: Create multiple VMs in CloudStack
   hosts: localhost
+  gather_facts: no
   collections:
     - ngine_io.cloudstack
-
   vars:
-    num_vms: 3
-    vpc_name: "vpc01.compfinity.local"
-    subnet_names: ["subnet01", "subnet02", "subnet03"]
-    subnet_cidrs: ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-    vm_name_prefix: "testvm"
-    domain_suffix: "compfinity.local"
-    api_url: "{{ lookup('env', 'API_URL') }}"
-    api_key: "{{ lookup('env', 'API_KEY') }}"
-    api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
-    zone: "us-east-1b"
-    affinity_groups: ["PROD", "DR", "UAT"]
+    api_key: "{{ cloudstack_api_key }}"
+    secret_key: "{{ cloudstack_secret_key }}"
+    zone: "{{ cloudstack_zone }}"
+    template: "{{ cloudstack_template }}"
+    service_offering: "{{ cloudstack_service_offering }}"
+    network: "{{ cloudstack_network }}"
+    base_name: "{{ vm_base_name }}"
+    vm_count: "{{ vm_count }}"
 
   tasks:
-    - name: Create subnets
-      loop: "{{ subnet_names }}"
-      loop_control:
-        loop_var: subnet_name
-      ngine_io.cloudstack.cs_subnet:
-        name: "{{ subnet_name }}"
-        display_text: "Example Subnet"
-        vpc: "{{ vpc_name }}"
-        cidr: "{{ subnet_cidrs[loop.index0] }}"
-        zone: "{{ zone }}"
-        api_key: "{{ api_key }}"
-        api_secret: "{{ api_secret }}"
-        api_url: "{{ api_url }}"
-      register: subnets
-
-    - name: Deploy VMs
-      loop: "{{ num_vms | range }}"
-      loop_control:
-        loop_var: vm_index
+    - name: Create VMs
       ngine_io.cloudstack.cs_instance:
-        name: "{{ vm_name_prefix }}{{ vm_index + 1 }}"
-        service_offering: "Small Instance"
-        template: "Ubuntu 22.04 LTS"
-        zone: "{{ zone }}"
-        network: "{{ subnets.results[vm_index % subnet_names | length].id }}"
-        ip_address: auto
         api_key: "{{ api_key }}"
-        api_secret: "{{ api_secret }}"
-        api_url: "{{ api_url }}"
-      register: vm_results
-
-    # Additional tasks for affinity groups can be added here
+        secret_key: "{{ secret_key }}"
+        zone: "{{ zone }}"
+        template: "{{ template }}"
+        service_offering: "{{ service_offering }}"
+        network: "{{ network }}"
+        name: "{{ base_name }}{{ item }}"
+        display_name: "{{ base_name }}{{ item }}"
+      loop: "{{ range(1, vm_count + 1) | list }}"
 

@@ -17,11 +17,7 @@
     network: "BrianNetwork"
     vpc_name: "BrianVPC"
     vpc_cidr: "10.1.0.0/16"
-    network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
     network_offering: "Offering for Isolated Vpc networks with Source Nat service enabled"
-    gateway: "10.1.0.1"
-    subnetmask: "255.255.0.0"
-    acl: "default_allow"
 
   tasks:
     - name: Create VPC
@@ -39,9 +35,6 @@
         name: "{{ network }}"
         vpc: "{{ vpc_result.id }}"
         network_offering: "{{ network_offering }}"
-        gateway: "{{ gateway }}"
-        cidr: "{{ vpc_cidr }}"
-        acl: "{{ acl }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"

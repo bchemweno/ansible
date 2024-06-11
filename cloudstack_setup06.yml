@@ -27,7 +27,7 @@
         template: "{{ template }}"
         service_offering: "{{ service_offering }}"
         network: "{{ network }}"
-        name: "{{ base_name }}{{ item }}"
-        display_name: "{{ base_name }}{{ item }}"
+        name: "{{ base_name }}{{ item | string }}"
+        display_name: "{{ base_name }}{{ item | string }}"
       loop: "{{ range(1, vm_count_int + 1) | list }}"
 

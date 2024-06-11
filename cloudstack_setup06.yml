@@ -14,7 +14,7 @@
     zone: "us-east-1a"
     template: "Ubuntu 22.04 LTS"
     service_offering: "Small Instance"
-    network: "Compfinity"
+    network: "Testvpcnw"
 
   tasks:
     - name: Deploy multiple VMs

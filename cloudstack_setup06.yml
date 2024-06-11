@@ -1,33 +1,32 @@
 ---
-- name: Create multiple VMs in CloudStack
+- name: Set up CloudStack environment
   hosts: localhost
   gather_facts: no
   collections:
     - ngine_io.cloudstack
+
   vars:
-    api_key: "{{ cloudstack_api_key }}"
-    secret_key: "{{ cloudstack_secret_key }}"
-    zone: "{{ cloudstack_zone }}"
-    template: "{{ cloudstack_template }}"
-    service_offering: "{{ cloudstack_service_offering }}"
-    network: "{{ cloudstack_network }}"
-    base_name: "{{ vm_base_name }}"
-    vm_count: "{{ vm_count }}"
+    num_vms: 2
+    vm_name_prefix: "brian-test"
+    api_url: "{{ lookup('env', 'API_URL') }}"
+    api_key: "{{ lookup('env', 'API_KEY') }}"
+    api_secret: "{{ lookup('env', 'SECRET_KEY') }}"
+    zone: "us-east-1a"
+    template: "Ubuntu 22.04 LTS"
+    service_offering: "Small Instance"
+    network: "Compfinity"
 
   tasks:
-    - name: Convert vm_count to integer
-      set_fact:
-        vm_count_int: "{{ vm_count | int }}"
-
-    - name: Create VMs
+    - name: Deploy multiple VMs
       ngine_io.cloudstack.cs_instance:
-        api_key: "{{ api_key }}"
-        secret_key: "{{ secret_key }}"
-        zone: "{{ zone }}"
-        template: "{{ template }}"
+        name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}"
         service_offering: "{{ service_offering }}"
+        template: "{{ template }}"
+        zone: "{{ zone }}"
         network: "{{ network }}"
-        name: "{{ base_name }}{{ item | string }}"
-        display_name: "{{ base_name }}{{ item | string }}"
-      loop: "{{ range(1, vm_count_int + 1) | list }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      loop: "{{ range(1, num_vms + 1) | list }}"
+      register: vm_results
 

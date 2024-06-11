@@ -15,6 +15,10 @@
     vm_count: "{{ vm_count }}"
 
   tasks:
+    - name: Convert vm_count to integer
+      set_fact:
+        vm_count_int: "{{ vm_count | int }}"
+
     - name: Create VMs
       ngine_io.cloudstack.cs_instance:
         api_key: "{{ api_key }}"
@@ -25,5 +29,5 @@
         network: "{{ network }}"
         name: "{{ base_name }}{{ item }}"
         display_name: "{{ base_name }}{{ item }}"
-      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop: "{{ range(1, vm_count_int + 1) | list }}"
 

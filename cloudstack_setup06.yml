@@ -17,6 +17,8 @@
     network: "BrianNetwork"
     vpc_name: "BrianVPC"
     vpc_cidr: "10.1.0.0/16"
+    gateway: "10.1.0.1"
+    netmask: "255.255.0.0"
     network_offering: "Offering for Isolated Vpc networks with Source Nat service enabled"
 
   tasks:
@@ -36,6 +38,8 @@
         vpc: "{{ vpc_result.id }}"
         network_offering: "{{ network_offering }}"
         api_key: "{{ api_key }}"
+        gateway: "{{ gateway }}"
+        netmask: "{{ netmask }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
         zone: "{{ zone }}"

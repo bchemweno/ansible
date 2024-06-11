@@ -1,5 +1,5 @@
 ---
-- name: Set up CloudStack environment
+- name: Set up CloudStack environment with VPC and Network
   hosts: localhost
   gather_facts: no
   collections:
@@ -14,19 +14,40 @@
     zone: "us-east-1a"
     template: "Ubuntu 22.04 LTS"
     service_offering: "Small Instance"
-    network: "Testvpcnw"
+    network: "Compfinity"
+    vpc_name: "BrianVPC"
+    vpc_cidr: "10.1.0.0/16"
+    network_offering: "DefaultIsolatedNetworkOfferingWithSourceNatService"
 
   tasks:
+    - name: Create VPC
+      ngine_io.cloudstack.cs_vpc:
+        name: "{{ vpc_name }}"
+        cidr: "{{ vpc_cidr }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      register: vpc_result
+
+    - name: Create Network in VPC
+      ngine_io.cloudstack.cs_network:
+        name: "{{ network }}"
+        vpc: "{{ vpc_result.id }}"
+        offering: "{{ network_offering }}"
+        api_key: "{{ api_key }}"
+        api_secret: "{{ api_secret }}"
+        api_url: "{{ api_url }}"
+      register: network_result
+
     - name: Deploy multiple VMs
       ngine_io.cloudstack.cs_instance:
         name: "{{ vm_name_prefix }}{{ '%02d' | format(item) }}"
         service_offering: "{{ service_offering }}"
         template: "{{ template }}"
         zone: "{{ zone }}"
-        network: "{{ network }}"
+        network: "{{ network_result.id }}"
         api_key: "{{ api_key }}"
         api_secret: "{{ api_secret }}"
         api_url: "{{ api_url }}"
       loop: "{{ range(1, num_vms + 1) | list }}"
       register: vm_results
-
